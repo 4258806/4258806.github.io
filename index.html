@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曾经的少年 - 个人主页</title>
+<link rel="stylesheet" href="https://unpkg.com/xp.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: Tahoma, "MS Sans Serif", sans-serif; }
+
+  /* ===== 壁纸：蓝天 + 草原 ===== */
+  .desktop {
+    position: fixed; inset: 0; bottom: 40px;
+    background: linear-gradient(to bottom, #2a6bc4 0%, #5a9bd5 45%, #8ec3e8 62%, #6a9a3a 62%, #4a8a26 100%);
+    overflow: hidden;
+  }
+  .cloud {
+    position: absolute; background: #fff; border-radius: 50%;
+    opacity: .95; filter: blur(1px);
+    animation: drift linear infinite;
+  }
+  .cloud.c1 { width: 180px; height: 46px; top: 60px; animation-duration: 90s; }
+  .cloud.c2 { width: 130px; height: 36px; top: 130px; animation-duration: 130s; animation-delay: -40s; }
+  .cloud.c3 { width: 220px; height: 52px; top: 30px; animation-duration: 160s; animation-delay: -90s; }
+  @keyframes drift { from { left: -240px; } to { left: 100%; } }
+  .hill {
+    position: absolute; left: -10%; bottom: 0; width: 120%; height: 200px;
+    background: linear-gradient(to bottom, #6aa84f, #4a8a26);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .hill2 {
+    position: absolute; right: -15%; bottom: 0; width: 80%; height: 130px;
+    background: linear-gradient(to bottom, #5a9e3a, #3f7a20);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+
+  /* ===== 桌面图标 ===== */
+  .icons { position: absolute; top: 16px; left: 16px; display: flex; flex-direction: column; gap: 22px; z-index: 1; }
+  .icon { width: 84px; text-align: center; cursor: pointer; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,.7); font-size: 12px; }
+  .icon .pic { font-size: 34px; line-height: 1.1; display: block; }
+  .icon:hover .pic { filter: brightness(1.2); }
+  .icon:active .pic { filter: brightness(.85); }
+
+  /* ===== 窗口 ===== */
+  .window { position: absolute; min-width: 320px; z-index: 10; box-shadow: 4px 4px 12px rgba(0,0,0,.45); }
+  .window .title-bar { cursor: move; user-select: none; }
+  .window-body { font-size: 13px; }
+  .window-body h3 { margin: 0 0 8px; }
+  .window-body p { margin: 6px 0; }
+
+  /* CMD 窗口 */
+  .cmd-body { background: #000; color: #fff; font-family: Consolas, "Courier New", monospace; font-size: 13px; line-height: 1.6; padding: 10px 12px; min-height: 260px; white-space: pre-wrap; }
+  .cmd-body .g { color: #0f0; }
+  .cmd-body .y { color: #ff0; }
+  .cursor { display: inline-block; width: 8px; height: 15px; background: #fff; vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ===== 任务栏 ===== */
+  .taskbar {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 40px; z-index: 100;
+    background: linear-gradient(to bottom, #3f8cf3, #245edb 50%, #3f8cf3);
+    display: flex; align-items: center; padding: 0 6px; gap: 6px;
+    border-top: 1px solid #5a9bd5;
+  }
+  .start-btn {
+    display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px 0 10px;
+    background: linear-gradient(to bottom, #5cb85c, #3d9c3d 50%, #2e7d2e);
+    border: 1px solid #1e5c1e; border-radius: 0 10px 10px 0; color: #fff;
+    font-size: 15px; font-weight: bold; font-style: italic; cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+  }
+  .start-btn:hover { filter: brightness(1.1); }
+  .start-btn:active { filter: brightness(.9); }
+  .flag { display: grid; grid-template-columns: 9px 9px; grid-template-rows: 8px 8px; gap: 1px; }
+  .flag i:nth-child(1) { background: #f65314; }
+  .flag i:nth-child(2) { background: #7cbb00; }
+  .flag i:nth-child(3) { background: #00a1f1; }
+  .flag i:nth-child(4) { background: #ffbb00; }
+  .task-btn {
+    height: 30px; padding: 0 12px; border: 1px solid #1e5cb8; border-radius: 4px;
+    background: #3a93ff; color: #fff; font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; max-width: 200px; overflow: hidden; white-space: nowrap;
+  }
+  .task-btn.active { background: #1e5cb8; box-shadow: inset 0 2px 4px rgba(0,0,0,.35); }
+  .clock {
+    margin-left: auto; height: 30px; padding: 0 12px; display: flex; align-items: center;
+    background: #1290e9; border: 1px solid #1e5cb8; border-radius: 4px; color: #fff; font-size: 12px;
+  }
+
+  /* ===== 开始菜单 ===== */
+  .start-menu {
+    position: fixed; left: 4px; bottom: 40px; width: 300px; z-index: 200; display: none;
+    background: #fff; border: 2px solid #0855dd; border-radius: 8px 8px 0 0; overflow: hidden;
+    box-shadow: 4px -2px 12px rgba(0,0,0,.4);
+  }
+  .start-menu.open { display: block; }
+  .start-menu .menu-head {
+    background: linear-gradient(to bottom, #0058e6, #3a93ff);
+    color: #fff; padding: 10px 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .start-menu .menu-head .avatar {
+    width: 40px; height: 40px; border-radius: 4px; background: #fff; color: #0058e6;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold;
+    border: 2px solid #fff;
+  }
+  .start-menu .menu-head b { font-size: 15px; }
+  .start-menu ul { list-style: none; margin: 0; padding: 6px 0; }
+  .start-menu li { padding: 7px 14px; font-size: 13px; cursor: pointer; display: flex; gap: 10px; align-items: center; }
+  .start-menu li:hover { background: #316ac5; color: #fff; }
+  .start-menu .menu-foot {
+    background: linear-gradient(to bottom, #0058e6, #3a93ff); color: #fff;
+    display: flex; justify-content: flex-end; gap: 8px; padding: 8px 12px; font-size: 12px;
+  }
+  .start-menu .menu-foot span { cursor: pointer; display: flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+
+<div class="desktop">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+  <div class="hill"></div>
+  <div class="hill2"></div>
+
+  <!-- 桌面图标 -->
+  <div class="icons">
+    <div class="icon" data-win="win-about"><span class="pic">💻</span>我的电脑</div>
+    <div class="icon" data-win="win-cmd"><span class="pic">⌨️</span>命令提示符</div>
+    <div class="icon" data-win="win-doc"><span class="pic">📁</span>我的文档</div>
+    <div class="icon" data-win="win-note"><span class="pic">📝</span>记事本</div>
+    <div class="icon" data-win="win-bin"><span class="pic">🗑️</span>回收站</div>
+  </div>
+
+  <!-- 关于我窗口 -->
+  <div class="window" id="win-about" style="left: 160px; top: 40px; width: 520px;">
+    <div class="title-bar">
+      <div class="title-bar-text">💻 曾经的少年 - 个人主页</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" data-act="min" data-win="win-about"></button>
+        <button aria-label="Maximize" data-act="max" data-win="win-about"></button>
+        <button aria-label="Close" data-act="close" data-win="win-about"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <h3>你好，我是曾经的少年 👋</h3>
+      <p>爱折腾 VPS 和 Oracle Cloud 的打工仔。</p>
+      <p>📍 昆明，云南</p>
+      <fieldset>
+        <legend>🛠️ 正在折腾</legend>
+        <ul>
+          <li>Oracle Cloud 免费实例 / 抢机脚本</li>
+          <li>VPS 线路测试与保活</li>
+          <li>Python / Shell / Linux</li>
+        </ul>
+      </fieldset>
+      <section class="field-row" style="justify-content: flex-end; margin-top: 10px;">
+        <button data-win-open="win-cmd">打开命令提示符</button>
+        <button onclick="window.open('https://github.com/4258806','_blank')">我的 GitHub</button>
+      </section>
+    </div>
+  </div>
+
+  <!-- CMD 窗口 -->
+  <div class="window" id="win-cmd" style="left: 240px; top: 120px; width: 560px;">
+    <div class="title-bar">
+      <div class="title-bar-text">C:\WINDOWS\system32\cmd.exe</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" data-act="min" data-win="win-cmd"></button>
+        <button aria-label="Maximize" data-act="max" data-win="win-cmd"></button>
+        <button aria-label="Close" data-act="close" data-win="win-cmd"></button>
+      </div>
+    </div>
+    <div class="cmd-body" id="cmd-body"></div>
+  </div>
+
+  <!-- 我的文档窗口 -->
+  <div class="window" id="win-doc" style="left: 320px; top: 80px; width: 460px; display: none;">
+    <div class="title-bar">
+      <div class="title-bar-text">📁 我的文档</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" data-act="min" data-win="win-doc"></button>
+        <button aria-label="Maximize" data-act="max" data-win="win-doc"></button>
+        <button aria-label="Close" data-act="close" data-win="win-doc"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <ul class="tree-view">
+        <li>📄 抢机脚本说明.txt</li>
+        <li>📄 OCI 延迟测试报告.md</li>
+        <li>📄 VPS 保活笔记.txt</li>
+        <li>📄 WinXP 怀旧墙纸.jpg</li>
+      </ul>
+      <p style="color: #666;">（演示文件，点击没有反应）</p>
+    </div>
+  </div>
+
+  <!-- 记事本窗口 -->
+  <div class="window" id="win-note" style="left: 380px; top: 160px; width: 440px; display: none;">
+    <div class="title-bar">
+      <div class="title-bar-text">📝 记事本 - 欢迎.txt</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" data-act="min" data-win="win-note"></button>
+        <button aria-label="Maximize" data-act="max" data-win="win-note"></button>
+        <button aria-label="Close" data-act="close" data-win="win-note"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <p>欢迎来到我的 WinXP 小站！</p>
+      <p>这个页面是用 XP.css 做的，窗口可以拖、可以关、开始菜单能点，命令提示符里还会自己打代码。</p>
+      <p>—— 曾经的少年</p>
+    </div>
+  </div>
+
+  <!-- 回收站窗口 -->
+  <div class="window" id="win-bin" style="left: 420px; top: 200px; width: 400px; display: none;">
+    <div class="title-bar">
+      <div class="title-bar-text">🗑️ 回收站</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" data-act="min" data-win="win-bin"></button>
+        <button aria-label="Maximize" data-act="max" data-win="win-bin"></button>
+        <button aria-label="Close" data-act="close" data-win="win-bin"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <p>回收站是空的。</p>
+      <p>（东西都还没舍得删）</p>
+    </div>
+  </div>
+</div>
+
+<!-- 开始菜单 -->
+<div class="start-menu" id="start-menu">
+  <div class="menu-head">
+    <div class="avatar">打</div>
+    <b>曾经的少年</b>
+  </div>
+  <ul>
+    <li data-win-open="win-about">💻 个人主页</li>
+    <li data-win-open="win-cmd">⌨️ 命令提示符</li>
+    <li data-win-open="win-doc">📁 我的文档</li>
+    <li data-win-open="win-note">📝 记事本</li>
+    <li onclick="window.open('https://github.com/4258806','_blank')">🌐 我的 GitHub</li>
+  </ul>
+  <div class="menu-foot">
+    <span onclick="alert('下次再见 👋')">⏻ 关机</span>
+    <span onclick="document.getElementById('start-menu').classList.remove('open')">✕ 取消</span>
+  </div>
+</div>
+
+<!-- 任务栏 -->
+<div class="taskbar">
+  <div class="start-btn" id="start-btn">
+    <span class="flag"><i></i><i></i><i></i><i></i></span>开始
+  </div>
+  <div class="task-btn active" data-win="win-about">💻 曾经的少年 - 个人主页</div>
+  <div class="task-btn active" data-win="win-cmd">⌨️ cmd.exe</div>
+  <div class="clock" id="clock">--:--</div>
+</div>
+
+<script>
+  // ===== 时钟 =====
+  function tick() {
+    var d = new Date();
+    var h = String(d.getHours()).padStart(2, '0');
+    var m = String(d.getMinutes()).padStart(2, '0');
+    document.getElementById('clock').textContent = h + ':' + m;
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ===== 窗口置顶 =====
+  var zTop = 20;
+  function bringToFront(el) { el.style.zIndex = ++zTop; }
+  document.querySelectorAll('.window').forEach(function (w) {
+    w.addEventListener('mousedown', function () { bringToFront(w); });
+  });
+
+  // ===== 拖动窗口 =====
+  document.querySelectorAll('.window .title-bar').forEach(function (bar) {
+    bar.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button')) return;
+      var win = bar.parentElement;
+      var sx = e.clientX - win.offsetLeft, sy = e.clientY - win.offsetTop;
+      function move(ev) {
+        win.style.left = Math.max(0, Math.min(window.innerWidth - 80, ev.clientX - sx)) + 'px';
+        win.style.top = Math.max(0, Math.min(window.innerHeight - 80, ev.clientY - sy)) + 'px';
+      }
+      function up() { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); }
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+    });
+  });
+
+  // ===== 打开 / 关闭 / 最小化窗口 =====
+  function openWin(id) {
+    var w = document.getElementById(id);
+    w.style.display = 'block';
+    bringToFront(w);
+    var btn = document.querySelector('.task-btn[data-win="' + id + '"]');
+    if (btn) btn.classList.add('active');
+  }
+  function closeWin(id) {
+    document.getElementById(id).style.display = 'none';
+    var btn = document.querySelector('.task-btn[data-win="' + id + '"]');
+    if (btn) btn.classList.remove('active');
+  }
+  document.querySelectorAll('[data-act]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.getAttribute('data-win');
+      var act = b.getAttribute('data-act');
+      if (act === 'close') closeWin(id);
+      if (act === 'min') closeWin(id);
+      if (act === 'max') {
+        var w = document.getElementById(id);
+        if (w.style.width === '96vw') { w.style.width = ''; w.style.left = ''; w.style.top = ''; }
+        else { w.style.width = '96vw'; w.style.left = '2vw'; w.style.top = '10px'; }
+      }
+    });
+  });
+  document.querySelectorAll('.icon[data-win], [data-win-open]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      openWin(el.getAttribute('data-win') || el.getAttribute('data-win-open'));
+      document.getElementById('start-menu').classList.remove('open');
+    });
+  });
+  document.querySelectorAll('.task-btn[data-win]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var w = document.getElementById(b.getAttribute('data-win'));
+      if (w.style.display === 'none') openWin(b.getAttribute('data-win'));
+      else closeWin(b.getAttribute('data-win'));
+    });
+  });
+
+  // ===== 开始菜单 =====
+  var startBtn = document.getElementById('start-btn');
+  var startMenu = document.getElementById('start-menu');
+  startBtn.addEventListener('click', function (e) { e.stopPropagation(); startMenu.classList.toggle('open'); });
+  document.addEventListener('click', function (e) {
+    if (!startMenu.contains(e.target)) startMenu.classList.remove('open');
+  });
+
+  // ===== CMD 打字机 =====
+  var cmdLines = [
+    { t: 'C:\\Users\\曾经的少年> python oci-test.py --count 20', c: '' },
+    { t: '正在测试 Oracle 46 个区域...', c: 'g' },
+    { t: '[ 1/46] ap-tokyo-1 ....... 42ms  极快', c: 'g' },
+    { t: '[ 2/46] ap-chuncheon-1 .. 58ms  极快', c: 'g' },
+    { t: '[ 3/46] eu-frankfurt-1 .. 186ms 快', c: 'y' },
+    { t: '[ 4/46] us-sanjose-1 .... 84ms  极快', c: 'g' },
+    { t: '测试完成! 最快: ap-tokyo-1 (42ms)', c: '' },
+    { t: 'C:\\Users\\曾经的少年> ', c: '' }
+  ];
+  var cmdBody = document.getElementById('cmd-body');
+  var li = 0, ci = 0, cur;
+  function typeCmd() {
+    if (li >= cmdLines.length) {
+      setTimeout(function () { cmdBody.innerHTML = ''; li = 0; ci = 0; typeCmd(); }, 5000);
+      return;
+    }
+    if (ci === 0) { cur = document.createElement('div'); if (cmdLines[li].c) cur.className = cmdLines[li].c; cmdBody.appendChild(cur); }
+    var line = cmdLines[li].t;
+    cur.textContent = line.slice(0, ++ci);
+    if (ci >= line.length) { li++; ci = 0; setTimeout(typeCmd, 450); }
+    else setTimeout(typeCmd, line.charAt(ci - 1) === ' ' ? 12 : 34);
+  }
+  // 光标
+  var cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  setInterval(function () {
+    if (!cmdBody.contains(cursor)) cmdBody.appendChild(cursor);
+  }, 500);
+  typeCmd();
+</script>
+</body>
+</html>
