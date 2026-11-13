@@ -146,7 +146,7 @@
     <div class="window-body">
       <h3>你好，我是曾经的少年 👋</h3>
       <p>爱折腾 VPS 和 Oracle Cloud 的打工仔。</p>
-      <p>📍 昆明，云南</p>
+      <p>📍 <span id="visitor-loc">正在获取你的位置...</span></p>
       <fieldset>
         <legend>🛠️ 正在折腾</legend>
         <ul>
@@ -268,6 +268,26 @@
     document.getElementById('clock').textContent = h + ':' + m;
   }
   tick(); setInterval(tick, 1000);
+
+  // ===== 访客位置（IP 定位，显示给访客自己看） =====
+  (function () {
+    var el = document.getElementById('visitor-loc');
+    if (!el) return;
+    function show(d) {
+      var parts = [d.city, d.region, d.country].filter(Boolean);
+      el.textContent = parts.length ? ('你当前的位置：' + parts.join('， ')) : '你的位置：未知';
+    }
+    function fail() { el.textContent = '你的位置：未知'; }
+    fetch('https://ipinfo.io/json')
+      .then(function (r) { return r.json(); })
+      .then(show)
+      .catch(function () {
+        fetch('https://ipapi.co/json/')
+          .then(function (r) { return r.json(); })
+          .then(function (d) { show({ city: d.city, region: d.region, country: d.country_name }); })
+          .catch(fail);
+      });
+  })();
 
   // ===== 窗口置顶 =====
   var zTop = 20;
