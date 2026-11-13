@@ -275,7 +275,9 @@
     if (!el) return;
     function show(d) {
       var parts = [d.city, d.region, d.country].filter(Boolean);
-      el.textContent = parts.length ? ('你当前的位置：' + parts.join('， ')) : '你的位置：未知';
+      var loc = parts.length ? parts.join('， ') : '未知';
+      var ip = d.ip ? ('（IP: ' + d.ip + '）') : '';
+      el.textContent = '你当前的位置：' + loc + ip;
     }
     function fail() { el.textContent = '你的位置：未知'; }
     fetch('https://ipinfo.io/json')
@@ -284,7 +286,7 @@
       .catch(function () {
         fetch('https://ipapi.co/json/')
           .then(function (r) { return r.json(); })
-          .then(function (d) { show({ city: d.city, region: d.region, country: d.country_name }); })
+          .then(function (d) { show({ city: d.city, region: d.region, country: d.country_name, ip: d.ip }); })
           .catch(fail);
       });
   })();
