@@ -204,7 +204,7 @@ curl -fs -o /dev/null --max-time 3 "http://127.0.0.1:${PORT}/login" 2>/dev/null 
 log_success "安装完成（版本 ${TAG}）"
 echo
 echo "面板地址：http://127.0.0.1:${PORT}/login"
-echo "默认账号：admin / admin（首次登录务必马上改密码）"
+echo "首次登录需要先注册第一个账号（没有默认账号；用户名不能是 admin/root 等常见名；密码 12-64 位，须含大小写字母和数字）；注册完成后不再开放注册。"
 echo "注意：面板默认只绑 127.0.0.1，只能本机访问；远程访问请用 SSH 隧道："
 echo "  ssh -L ${PORT}:127.0.0.1:${PORT} root@<这台VPS的IP> -p <SSH端口>"
 echo "然后在自己电脑浏览器打开 http://127.0.0.1:${PORT}/login"
